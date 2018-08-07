@@ -36,11 +36,8 @@ class runningScore(object):
         freq = hist.sum(axis=1) / hist.sum()
         fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
         cls_iu = dict(zip(range(self.n_classes), iu))
-        return (acc,acc_cls,fwavacc,mean_iu),cls_iu
-        # return {'Overall Acc: \t': acc,
-        #         'Mean Acc : \t': acc_cls,
-        #         'FreqW Acc : \t': fwavacc,
-        #         'Mean IoU : \t': mean_iu,}, cls_iu
+
+        return [acc,acc_cls,fwavacc,mean_iu], cls_iu
 
     def reset(self):
         self.confusion_matrix = np.zeros((self.n_classes, self.n_classes))

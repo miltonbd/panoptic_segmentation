@@ -1,5 +1,5 @@
 import sys, os
-gpu=0
+gpu=1
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu)
 import torch
@@ -74,33 +74,25 @@ def train(args):
     else:
         loss_fn = cross_entropy2d
 
+    start_epoch=0
     try:
-        if os.path.isfile(args.resume):
-            print("Loading model and optimizer from checkpoint '{}'".format(args.resume))
+        if os.path.isfile(best_saved_model_name):
+            print("Loading model and optimizer from checkpoint '{}'".format(best_saved_model_name))
             checkpoint = torch.load(best_saved_model_name)
             model.load_state_dict(checkpoint['model_state'])
             optimizer.load_state_dict(checkpoint['optimizer_state'])
-            print("Loaded checkpoint '{}' (epoch {})"                    
-                  .format(args.resume, checkpoint['epoch']))
-    Exception:
-            print("No checkpoint found at '{}'".format(args.resume))
-
-
-    try:
-        # Load checkpoint.
-        checkpoint = torch.load(sa)
-        model.load_state_dict(checkpoint['model'].state_dict())
-        self.best_acc = checkpoint['acc']
-        self.start_epoch = checkpoint['epoch']
-        print('==> Resuming from checkpoint with Accuracy {}..'.format(self.best_acc))
-
+            start_epoch=checkpoint['epoch']
+            print("Checkpoint Loaded Successfully: '{}' (epoch {})"
+                  .format(best_saved_model_name, start_epoch))
     except Exception as e:
-        print('==> Resume Failed and Building model..')
+            print("No checkpoint found at '{}'".format(e))
 
     best_iou = -100.0 
-    for epoch in range(args.n_epoch):
+    for epoch in range(start_epoch, args.n_epoch):
         model.train()
         for i, (images, labels) in enumerate(trainloader):
+            # if i>10:
+            #     break
             images = Variable(images.cuda())
             labels = Variable(labels.cuda())
             step = epoch * len(trainloader) + i
@@ -125,6 +117,8 @@ def train(args):
 
         model.eval()
         for i_val, (images_val, labels_val) in tqdm(enumerate(valloader)):
+            # if i > 10:
+            #     break
             images_val = Variable(images_val.cuda(), volatile=True)
             labels_val = Variable(labels_val.cuda(), volatile=True)
 
@@ -153,10 +147,10 @@ def train(args):
                      'optimizer_state' : optimizer.state_dict(),
                      'iou':mean_iu}
             torch.save(state, best_saved_model_name)
-
+F
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Hyperparams')
-    parser.add_argument('--arch', nargs='?', type=str, default='pspnet',
+    parser.add_argument('--arch', nargs='?', type=str, default='fcn8s',
                         help='Architecture to use [\'fcn8s, unet, segnet, pspnet etc\']')
     parser.add_argument('--dataset', nargs='?', type=str, default='pascal', 
                         help='Dataset to use [\'pascal, camvid, ade20k etc\']')

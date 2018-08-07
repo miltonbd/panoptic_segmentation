@@ -6,7 +6,7 @@
 
   "sbd":
   {
-    "data_path": "/media/milton/ssd1/dataset/pascal/sbd/benchmark_RELEASE/"
+    "data_path": "/media/milton/ssd1/dataset/pascal/sbd/benchmark_RELEASE"
   },
 
   "camvid":
